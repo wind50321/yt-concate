@@ -1,3 +1,5 @@
+import time
+
 from pytube import YouTube
 
 from .step import Step
@@ -6,9 +8,13 @@ from .step import StepException
 
 class DownloadCaptions(Step):
     def process(self, data, inputs, utils):
-        for url in data:
+
+        start = time.time()
+
+        for yt in data:
+            url = yt.url
             print('downloading caption for', url)
-            if utils.catpion_file_exists(url):
+            if utils.caption_file_exists(yt):
                 print('Found existing caption file')
                 continue
 
@@ -23,3 +29,8 @@ class DownloadCaptions(Step):
             text_file = open(utils.get_caption_filepath(url), "w", encoding='utf-8')
             text_file.write(en_caption_convert_to_srt)
             text_file.close()
+
+        end = time.time()
+        print('took', end - start, 'seconds')
+
+        return data
