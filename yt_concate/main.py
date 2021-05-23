@@ -2,9 +2,13 @@ from yt_concate.pipeline.steps.preflight import Preflight
 from yt_concate.pipeline.steps.get_video_list import GetVideoList
 from yt_concate.pipeline.steps.initialize_yt import InitializeYT
 from yt_concate.pipeline.steps.download_captions import DownloadCaptions
+from yt_concate.pipeline.steps.download_captions_thread import DownloadCaptionsThread
+from yt_concate.pipeline.steps.download_captions_concur_thread import DownloadCaptionsConcurThread
 from yt_concate.pipeline.steps.read_caption import ReadCaption
 from yt_concate.pipeline.steps.search import Search
 from yt_concate.pipeline.steps.download_videos import DownloadVideos
+from yt_concate.pipeline.steps.download_videos_thread import DownloadVideosThread
+from yt_concate.pipeline.steps.download_videos_concur_thread import DownloadVideosConcurThread
 from yt_concate.pipeline.steps.edit_video import EditVideo
 from yt_concate.pipeline.steps.postflight import Postflight
 from yt_concate.pipeline.steps.step import StepException
@@ -26,11 +30,11 @@ def main():
         Preflight(),
         GetVideoList(),
         InitializeYT(),
-        DownloadCaptions(),
+        DownloadCaptionsConcurThread(),
         ReadCaption(),
         Search(),
-        DownloadVideos(),
-        EditVideo(),
+        DownloadVideosConcurThread(),
+        # EditVideo(),
         Postflight(),
     ]
 

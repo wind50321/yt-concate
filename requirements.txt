@@ -9,7 +9,8 @@ numpy==1.20.3
 Pillow==8.2.0
 proglog==0.1.9
 python-dotenv==0.17.1
-pytube==10.8.1
+pytube==10.8.2
 requests==2.25.1
 tqdm==4.60.0
+typing-extensions==3.10.0.0
 urllib3==1.26.4

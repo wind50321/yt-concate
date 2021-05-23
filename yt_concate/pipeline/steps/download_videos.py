@@ -6,7 +6,7 @@ from yt_concate.settings import VIDEOS_DIR
 
 class DownloadVideos(Step):
     def process(self, data, inputs, utils):
-        yt_set = set([found.yt for found in data])  # 過濾講多次關鍵字的重複影片
+        yt_set = set([found.yt for found in data])  # 避免重複下載講多次關鍵字的影片
         print('video to download=', len(yt_set))
         for yt in yt_set:
             url = yt.url
