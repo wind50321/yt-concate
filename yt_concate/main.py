@@ -1,3 +1,7 @@
+import sys
+sys.path.append('../')  # 把視野清單改成上一層，讓CMD可以找得到yt_concate
+import getopt
+
 from yt_concate.pipeline.steps.preflight import Preflight
 from yt_concate.pipeline.steps.get_video_list import GetVideoList
 from yt_concate.pipeline.steps.initialize_yt import InitializeYT
@@ -16,15 +20,57 @@ from yt_concate.pipeline.pipeline import Pipeline
 from yt_concate.utils import Utils
 
 
-CHANNEL_ID = 'UCKSVUHI9rbbkXhvAXK-2uxA'
+def print_usage():
+    print('python argv.py OPTIONS')
+    print('{:>6} {:<12} {}'.format('-c', '--channel', 'Channel id for searching videos. (Required)'))
+    print('{:>6} {:<12} {}'.format('-w', '--word', 'Word for searching from captions. (Required)'))
+    print('{:>6} {:<12} {}'.format('-l', '--limit', 'Limit for concatenating found videos. (Required)'))
+    print('{:>6} {:<12} {}'.format('', '--cleanup', 'Clean up downloaded captions and video after outputting. (Default=False)'))
+    print('{:>6} {:<12} {}'.format('', '--fast', 'Check downloaded captions and videos for faster task. (Default=True)'))
+
+
+def set_inputs(inputs):
+    short_opts = 'hc:w:l:'
+    long_opts = 'help channel= word= limit= cleanup= fast='.split()
+
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], short_opts, long_opts)
+    except getopt.GetoptError:
+        print_usage()
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt == '-h':
+            print_usage()
+            sys.exit(0)
+        elif opt in ('-c', '--channel') and arg:
+            inputs['channel_id'] = arg
+        elif opt in ('-w', '--word') and arg:
+            inputs['search_word'] = arg
+        elif opt in ('-l', '--limit') and arg.isdigit():
+            inputs['limit'] = int(arg)
+        elif opt == '--cleanup' and arg == 'True':
+            inputs['cleanup'] = True
+        elif opt == '--fast' and arg == 'False':  # bool('False') returns True
+            inputs['fast'] = False
+
+    if not inputs['channel_id'] or not inputs['search_word'] or not inputs['limit']:
+        print_usage()
+        sys.exit(2)
+
+    return inputs
 
 
 def main():
     inputs = {
-        'channel_id': CHANNEL_ID,
-        'search_word': 'incredible',
-        'limit': 20,
+        'channel_id': '',
+        'search_word': '',
+        'limit': 0,
+        'cleanup': False,
+        'fast': True,
     }
+    inputs = set_inputs(inputs)
+    print(inputs)
 
     steps = [
         Preflight(),
@@ -34,7 +80,7 @@ def main():
         ReadCaption(),
         Search(),
         DownloadVideosConcurThread(),
-        # EditVideo(),
+        EditVideo(),
         Postflight(),
     ]
 

@@ -6,17 +6,20 @@ from .step import Step
 
 class EditVideo(Step):
     def process(self, data, inputs, utils):
-        clips = []
+        videos = []
         for found in data:
             start, end = self.parse_caption_time(found.time)
             video = VideoFileClip(found.yt.video_filepath).subclip(start, end)
-            clips.append(video)
-            if len(clips) >= inputs['limit']:
+            videos.append(video)
+            if len(videos) >= inputs['limit']:
                 break
 
-        final_clip = concatenate_videoclips(clips)
+        final_video = concatenate_videoclips(videos)
         output_filepath = utils.get_output_filepath(inputs['channel_id'], inputs['search_word'])
-        final_clip.write_videofile(output_filepath)
+        final_video.write_videofile(output_filepath)
+
+        for video in videos:
+            video.close()
 
     def parse_caption_time(self, caption_time):
         start, end = caption_time.split(' --> ')

@@ -17,17 +17,16 @@ class DownloadVideosConcurThread(Step):
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
             for yt in yt_set:
-                if utils.video_file_exists(yt):
+                if inputs['fast'] and utils.video_file_exists(yt):
                     print(f'found existing video file {yt.url}, skipping')
                     continue
-
-                executor.submit(self.download_yt, yt, inputs, utils)
+                executor.submit(self.download_video, yt, inputs, utils)
 
         end = time.time()
         print('took', end - start, 'seconds')
 
         return data
 
-    def download_yt(self, yt, inputs, utils):
-        print('downloading', yt.url)
+    def download_video(self, yt, inputs, utils):
+        print('downloading video for', yt.url)
         YouTube(yt.url).streams.first().download(output_path=VIDEOS_DIR, filename=yt.id)

@@ -15,11 +15,9 @@ class DownloadCaptionsConcurThread(Step):
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
             for yt in data:
-                print('downloading caption for', yt.url)
-                if utils.caption_file_exists(yt):
-                    print('Found existing caption file')
+                if inputs['fast'] and utils.caption_file_exists(yt):
+                    print(f'found existing caption file {yt.url}, skipping')
                     continue
-
                 executor.submit(self.download_captions, yt, inputs, utils)
 
         end = time.time()
@@ -28,6 +26,7 @@ class DownloadCaptionsConcurThread(Step):
         return data
 
     def download_captions(self, yt, inputs, utils):
+        print('downloading caption for', yt.url)
         try:
             source = YouTube(yt.url)
             en_caption = source.captions['a.en']
