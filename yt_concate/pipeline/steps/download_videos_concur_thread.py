@@ -1,6 +1,6 @@
 import concurrent.futures
 import time
-import os
+import logging
 
 from pytube import YouTube
 
@@ -10,23 +10,24 @@ from yt_concate.settings import VIDEOS_DIR
 
 class DownloadVideosConcurThread(Step):
     def process(self, data, inputs, utils):
+        logger = logging.getLogger('main')
         start = time.time()
 
         yt_set = set([found.yt for found in data])  # 避免重複下載講多次關鍵字的影片
-        print('video to download=', len(yt_set))
+        logger.info(f'video to download = {len(yt_set)}')
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
             for yt in yt_set:
                 if inputs['fast'] and utils.video_file_exists(yt):
-                    print(f'found existing video file {yt.url}, skipping')
+                    logger.debug(f'found existing video file {yt.url}, skipping')
                     continue
-                executor.submit(self.download_video, yt, inputs, utils)
+                executor.submit(self.download_video, yt, inputs, utils, logger)
 
         end = time.time()
-        print('took', end - start, 'seconds')
+        logger.debug(f'took {end - start} seconds')
 
         return data
 
-    def download_video(self, yt, inputs, utils):
-        print('downloading video for', yt.url)
+    def download_video(self, yt, inputs, utils, logger):
+        logger.debug(f'downloading video for {yt.url}')
         YouTube(yt.url).streams.first().download(output_path=VIDEOS_DIR, filename=yt.id)

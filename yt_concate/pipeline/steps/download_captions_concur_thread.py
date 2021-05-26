@@ -1,5 +1,6 @@
 import concurrent.futures
 import time
+import logging
 
 from pytube import YouTube
 
@@ -9,24 +10,24 @@ from .step import StepException
 
 class DownloadCaptionsConcurThread(Step):
     def process(self, data, inputs, utils):
-
-        print('download captions:', len(data))
+        logger = logging.getLogger('main')
+        logger.info(f'captions to download = {len(data)}')
         start = time.time()
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
             for yt in data:
                 if inputs['fast'] and utils.caption_file_exists(yt):
-                    print(f'found existing caption file {yt.url}, skipping')
+                    logger.debug(f'found existing caption file {yt.url}, skipping')
                     continue
-                executor.submit(self.download_captions, yt, inputs, utils)
+                executor.submit(self.download_captions, yt, inputs, utils, logger)
 
         end = time.time()
-        print('took', end - start, 'seconds')
+        logger.debug(f'took {end - start} seconds')
 
         return data
 
-    def download_captions(self, yt, inputs, utils):
-        print('downloading caption for', yt.url)
+    def download_captions(self, yt, inputs, utils, logger):
+        logger.debug(f'downloading caption for {yt.url}')
         try:
             source = YouTube(yt.url)
             en_caption = source.captions['a.en']
@@ -35,4 +36,4 @@ class DownloadCaptionsConcurThread(Step):
             text_file.write(en_caption_convert_to_srt)
             text_file.close()
         except KeyError:
-            print('KeyError when downloading caption for', yt.url)
+            logger.error(f'KeyError when downloading caption for {yt.url}')
