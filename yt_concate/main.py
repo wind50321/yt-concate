@@ -22,7 +22,7 @@ from yt_concate.utils import Utils
 
 
 def print_usage():
-    print('python argv.py OPTIONS')
+    print('python main.py OPTIONS')
     print('{:>6} {:<12} {}'.format('-c', '--channel', 'Channel id for searching videos. (Required)'))
     print('{:>6} {:<12} {}'.format('-w', '--word', 'Word for searching from captions. (Required)'))
     print('{:>6} {:<12} {}'.format('-l', '--limit', 'Limit for concatenating found videos. (Required)'))
