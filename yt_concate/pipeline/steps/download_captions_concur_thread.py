@@ -19,14 +19,14 @@ class DownloadCaptionsConcurThread(Step):
                 if inputs['fast'] and utils.caption_file_exists(yt):
                     logger.debug(f'found existing caption file {yt.url}, skipping')
                     continue
-                executor.submit(self.download_captions, yt, inputs, utils, logger)
+                executor.submit(self.download_captions, yt, logger)
 
         end = time.time()
         logger.debug(f'took {end - start} seconds')
 
         return data
 
-    def download_captions(self, yt, inputs, utils, logger):
+    def download_captions(self, yt, logger):
         logger.debug(f'downloading caption for {yt.url}')
         try:
             source = YouTube(yt.url)

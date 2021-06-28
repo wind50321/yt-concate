@@ -21,13 +21,13 @@ class DownloadVideosConcurThread(Step):
                 if inputs['fast'] and utils.video_file_exists(yt):
                     logger.debug(f'found existing video file {yt.url}, skipping')
                     continue
-                executor.submit(self.download_video, yt, inputs, utils, logger)
+                executor.submit(self.download_video, yt, logger)
 
         end = time.time()
         logger.debug(f'took {end - start} seconds')
 
         return data
 
-    def download_video(self, yt, inputs, utils, logger):
+    def download_video(self, yt, logger):
         logger.debug(f'downloading video for {yt.url}')
         YouTube(yt.url).streams.first().download(output_path=VIDEOS_DIR, filename=yt.id)
